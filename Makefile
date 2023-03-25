@@ -8,6 +8,8 @@ rtl8xxxu_git-y	:= rtl8xxxu_core.o rtl8xxxu_8192e.o rtl8xxxu_8723b.o \
 		   rtl8xxxu_8723a.o rtl8xxxu_8192c.o rtl8xxxu_8188f.o \
 		   rtl8xxxu_8188e.o rtl8xxxu_8710b.o
 
+ldflags-y += --strip-debug
+
 else
 
 KVER ?= $(shell uname -r)
