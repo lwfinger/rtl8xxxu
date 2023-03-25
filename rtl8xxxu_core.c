@@ -13,6 +13,7 @@
  * additional 8xxx chips like the 8192cu, 8188cus, etc.
  */
 
+#include <linux/version.h>
 #include <linux/init.h>
 #include <linux/kernel.h>
 #include <linux/sched.h>
@@ -7024,7 +7025,11 @@ static void rtl8xxxu_stop(struct ieee80211_hw *hw)
 
 static const struct ieee80211_ops rtl8xxxu_ops = {
 	.tx = rtl8xxxu_tx,
+
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 2, 0))
 	.wake_tx_queue = ieee80211_handle_wake_tx_queue,
+#endif
+
 	.add_interface = rtl8xxxu_add_interface,
 	.remove_interface = rtl8xxxu_remove_interface,
 	.config = rtl8xxxu_config,
