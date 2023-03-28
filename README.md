@@ -4,8 +4,12 @@ Backporting the RTL8188GU driver to the old kernels from the linux git tree.
 
 ### How To Use
 
+(Build and install manually)
 1. make clean modules 
 2. sudo make install
+
+(Build and install via DKMS)
+1. sudo dkms install .
 
 ### Note
 
