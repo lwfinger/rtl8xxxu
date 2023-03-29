@@ -27,7 +27,7 @@ install:
 	@mkdir -pv $(FWDIR)
 	strip -g rtl8xxxu_git.ko
 	install -p -m 644 rtl8xxxu_git.ko $(MODDIR)
-	@cp -v rtl8710bufw_*.bin $(FWDIR)
+	@cp -v firmware/rtl8710bufw_*.bin $(FWDIR)
 	echo blacklist rtl8xxxu > $(BLCONF)
 	depmod -a $(KVER)
 
