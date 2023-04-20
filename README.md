@@ -1,16 +1,26 @@
-### Linux Driver for RTL8188GU
+### RTL8188GU Driver for Linux
 
 Backporting the RTL8188GU driver to the old kernels from the linux git tree.
 
 ### How To Use
 
-(Build and install manually)
-1. make clean modules 
-2. sudo make install
+1. Install gcc, make, linux-headers and other packages required to build this driver
 
+2. Change the wifi dongle to "Wifi Mode" by using "usb_modeswitch" or "eject" commands
 
-(Build and install via DKMS)
-1. sudo dkms install $PWD
+3. Build and install the driver
+
+   (In a traditional way)
+
+   $ make clean modules && sudo make install
+
+   (In a DKMS way)
+
+   $ sudo dkms install $PWD
+
+4. Load the driver
+
+   $ sudo modprobe rtl8xxxu_git
 
 ### Note
 
