@@ -24,7 +24,7 @@ Backporting the RTL8188GU driver to the old kernels from the linux git tree.
 
 ### Note
 
-Supported linux kernel version: 6.0.x ~ 6.2.x
+Supported linux kernel version: 6.0.x ~ 6.3.x
 
 Tested on Debian 11.6 (kernel version: 6.0.0-0.deb11.6-amd64) and it works fine.
 
