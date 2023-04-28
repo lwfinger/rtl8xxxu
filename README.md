@@ -2,6 +2,12 @@
 
 Backporting the RTL8188GU driver to the old kernels from the linux git tree.
 
+The following chips are also supported.
+
+RTL8191CU / RTL8192CU / RTL8192EU / RTL8723AU / RTL8723BU
+
+RTL8188CU / RTL8188EU / RTL8188FU / RTL8188RU
+
 ### How To Use
 
 1. Install gcc, make, linux-headers and other packages required to build this driver

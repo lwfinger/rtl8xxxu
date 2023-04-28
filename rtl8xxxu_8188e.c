@@ -568,10 +568,6 @@ static int rtl8188eu_parse_efuse(struct rtl8xxxu_priv *priv)
 
 	priv->default_crystal_cap = efuse->xtal_k & 0x3f;
 
-	dev_info(&priv->udev->dev, "Vendor: %.7s\n", efuse->vendor_name);
-	dev_info(&priv->udev->dev, "Product: %.11s\n", efuse->device_name);
-	dev_info(&priv->udev->dev, "Serial: %.11s\n", efuse->serial);
-
 	return 0;
 }
 
@@ -1700,6 +1696,12 @@ void rtl8188e_handle_ra_tx_report2(struct rtl8xxxu_priv *priv, struct sk_buff *s
 
 	dev_dbg(dev, "%s: len: %d items: %d\n", __func__, tx_rpt_len, items);
 
+	/* We only use macid 0, so only the first item is relevant.
+	 * AP mode will use more of them if it's ever implemented.
+	 */
+	if (!priv->vif || priv->vif->type == NL80211_IFTYPE_STATION)
+		items = 1;
+
 	for (macid = 0; macid < items; macid++) {
 		valid = false;
 
@@ -1742,12 +1744,6 @@ void rtl8188e_handle_ra_tx_report2(struct rtl8xxxu_priv *priv, struct sk_buff *s
 			min_rpt_time = ra->rpt_time;
 
 		rpt += TX_RPT2_ITEM_SIZE;
-
-		/*
-		 * We only use macid 0, so only the first item is relevant.
-		 * AP mode will use more of them if it's ever implemented.
-		 */
-		break;
 	}
 
 	if (min_rpt_time != ra->pre_min_rpt_time) {
@@ -1883,6 +1879,7 @@ struct rtl8xxxu_fileops rtl8188eu_fops = {
 	.rx_desc_size = sizeof(struct rtl8xxxu_rxdesc16),
 	.tx_desc_size = sizeof(struct rtl8xxxu_txdesc32),
 	.has_tx_report = 1,
+	.init_reg_pkt_life_time = 1,
 	.gen2_thermal_meter = 1,
 	.adda_1t_init = 0x0b1b25a0,
 	.adda_1t_path_on = 0x0bdb25a0,
