@@ -16,6 +16,8 @@ MODDIR ?= /lib/modules/$(KVER)/extra
 FWDIR := /lib/firmware/rtlwifi
 BLCONF := /etc/modprobe.d/blacklist-rtl8xxxu.conf
 
+.PHONY: modules clean install uninstall
+
 modules:
 	$(MAKE) -C $(KDIR) M=$$PWD modules
 
