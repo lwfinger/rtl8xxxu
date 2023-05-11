@@ -10,7 +10,6 @@ RTL8188CU / RTL8188EU / RTL8188FU / RTL8188RU
 
 RTL8191CU / RTL8192CU / RTL8192EU / RTL8192FU
 
-
 ### How To Use
 
 1. Install gcc, make, linux-headers and other packages required to build this driver
