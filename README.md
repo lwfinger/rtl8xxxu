@@ -1,24 +1,22 @@
-### RTL8188GU Driver for Linux
+### Kernel Module "rtl8xxxu" Backported from the Linux Git Tree
 
-Backporting the RTL8188GU driver to the old kernels from the linux git tree.
+The following chips are supported currently.
 
-The following chips are also supported.
-
-RTL8723AU / RTL8723BU
-
-RTL8188CU / RTL8188EU / RTL8188FU / RTL8188RU
+RTL8188CU / RTL8188EU / RTL8188FU / RTL8188GU / RTL8188RU
 
 RTL8191CU / RTL8192CU / RTL8192EU / RTL8192FU
 
+RTL8723AU / RTL8723BU
+
 ### How To Use
 
-1. Install gcc, make, linux-headers and other packages required to build this driver
+1. Install gcc, make, linux-headers and other packages required to build this module
 
-2. If your usb wifi dongle uses RTL8188GU or RTL8192FU chip,
+2. If your usb wifi dongle uses a RTL8188GU or RTL8192FU chip, you may need to
 
-   switch it to "Wifi Mode" first by using the "usb_modeswitch" or "eject" command.
+   switch it to "Wifi Mode" first by using the "usb_modeswitch" or "eject" command
 
-3. Build and install the driver
+3. Build and install the module 
 
    (In a traditional way)
 
@@ -28,7 +26,7 @@ RTL8191CU / RTL8192CU / RTL8192EU / RTL8192FU
 
    $ sudo dkms install $PWD
 
-4. Load the driver
+4. Load the module
 
    $ sudo modprobe rtl8xxxu_git
 
@@ -38,7 +36,7 @@ Supported linux kernel version: 6.0.x ~ 6.3.x
 
 Tested on Debian 11.6 (kernel version: 6.1.0-0.deb11.6-amd64) and it works fine.
 
-Thanks to the author Bitterblue Smith and all the maintainers of this kernel module!
+Thanks to all the maintainers of this kernel module!
 
 ### WARNING
 
