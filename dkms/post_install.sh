@@ -7,7 +7,7 @@ if [ ! -d ${FWDIR} ]; then
 	mkdir -p ${FWDIR}
 fi
 
-cp -v firmware/rtl8710bufw_*.bin ${FWDIR}
+cp -v firmware/rtl8*.bin ${FWDIR}
 
 echo blacklist rtl8xxxu > ${BLCONF}
 
