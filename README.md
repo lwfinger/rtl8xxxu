@@ -10,11 +10,11 @@ RTL8723AU / RTL8723BU
 
 ### How To Use
 
-1. Install gcc, make, linux-headers and other packages required to build this module
-
-2. If your usb wifi dongle uses a RTL8188GU or RTL8192FU chip, you may need to
+1. If your usb wifi dongle uses a RTL8188GU or RTL8192FU chip, you may need to
 
    switch it to "Wifi Mode" first by using the "usb_modeswitch" or "eject" command
+
+2. Install gcc, make, linux-headers and other packages required to build this module
 
 3. Build and install the module 
 
@@ -26,7 +26,11 @@ RTL8723AU / RTL8723BU
 
    $ sudo dkms install $PWD
 
-4. Load the module
+4. Install the firmware for RTL8188FU/RTL8188GU/RTL8192EU/RTL8192FU chips (Optional)
+
+   $ sudo make install_fw
+
+5. Load the module
 
    $ sudo modprobe rtl8xxxu_git
 

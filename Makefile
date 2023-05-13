@@ -16,7 +16,7 @@ MODDIR ?= /lib/modules/$(KVER)/extra
 FWDIR := /lib/firmware/rtlwifi
 BLCONF := /etc/modprobe.d/blacklist-rtl8xxxu.conf
 
-.PHONY: modules clean install uninstall
+.PHONY: modules clean install install_fw uninstall
 
 modules:
 	$(MAKE) -C $(KDIR) M=$$PWD modules
@@ -26,20 +26,19 @@ clean:
 
 install:
 	@mkdir -pv $(MODDIR)
-	@mkdir -pv $(FWDIR)
 	strip -g rtl8xxxu_git.ko
 	install -p -m 644 rtl8xxxu_git.ko $(MODDIR)
-	@cp -v firmware/rtl8*.bin $(FWDIR)
-	echo blacklist rtl8xxxu > $(BLCONF)
+	echo "blacklist rtl8xxxu" > $(BLCONF)
 	depmod -a $(KVER)
+	
+install_fw:
+	@mkdir -pv $(FWDIR)
+	@cp -v firmware/* $(FWDIR)
 
 uninstall:
 	@rm -vf $(MODDIR)/rtl8xxxu_git.ko
-	@rm -vf $(FWDIR)/rtl8710bufw_*.bin
-	@rm -vf $(FWDIR)/rtl8192fufw.bin
 	@rm -vf $(BLCONF)
 	depmod -a $(KVER)
-	@rmdir --ignore-fail-on-non-empty $(FWDIR)
 	@rmdir --ignore-fail-on-non-empty $(MODDIR)
 
 endif
