@@ -7342,6 +7342,10 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
 		if (id->idProduct == 0x0109)
 			untested = 0;
 		break;
+	case 0x0b05:
+		if (id->idProduct == 0x18f1)
+			untested = 0;
+		break;
 	default:
 		break;
 	}
