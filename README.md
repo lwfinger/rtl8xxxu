@@ -1,12 +1,18 @@
-### Kernel Module "rtl8xxxu" Backported from the Linux Git Tree
+### Linux Kernel Module "rtl8xxxu"
 
-The following chips are supported currently.
-
-RTL8188CU / RTL8188EU / RTL8188FU / RTL8188GU / RTL8188RU
-
-RTL8191CU / RTL8192CU / RTL8192EU / RTL8192FU
-
-RTL8723AU / RTL8723BU
+Driver for Realtek RTL8XXXXU usb wifi chips which is backported from linux mainline
+<details>
+<summary>Click here to display a list of supported chips</summary>
+<pre><code>
+RTL8188CU/CUS/CTV
+RTL8188EU/EUS/ETV
+RTL8188FU/FTV
+RTL8188GU | RTL8188RU
+RTL8191CU | RTL8192CU 
+RTL8192EU | RTL8192FU
+RTL8723AU | RTL8723BU
+</code></pre>
+</details>
 
 ### How To Use
 
@@ -18,15 +24,19 @@ RTL8723AU / RTL8723BU
 
 3. Build and install the module 
 
-   (In a traditional way)
+   * _In a traditional way_
 
-   $ make clean modules && sudo make install
+     `make clean modules && sudo make install`
 
-   (In a DKMS way)
+   * _In a DKMS way_
 
-   $ sudo dkms install $PWD
+     `sudo dkms install $PWD`
 
-4. Install the firmware for RTL8188FU/RTL8188GU/RTL8192EU/RTL8192FU chips (Optional)
+   * _For Arch-based Linux distro users_
+
+     Install [rtl8xxxu-dkms-git](https://aur.archlinux.org/packages/rtl8xxxu-dkms-git) package from AUR.
+
+4. Install firmware for RTL8188EU/RTL8188FU/RTL8188GU/RTL8192EU/RTL8192FU chips (Optional)
 
    $ sudo make install_fw
 
@@ -44,4 +54,4 @@ Thanks to all the maintainers of this kernel module!
 
 ### WARNING
 
-No warranty, use at your own risk.
+No warranty, use at your own risk. :warning:

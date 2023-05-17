@@ -25,15 +25,13 @@ clean:
 	$(MAKE) -C $(KDIR) M=$$PWD clean
 
 install:
-	@mkdir -pv $(MODDIR)
 	strip -g rtl8xxxu_git.ko
-	install -p -m 644 rtl8xxxu_git.ko $(MODDIR)
+	@install -Dvm 644 -t $(MODDIR) rtl8xxxu_git.ko
 	echo "blacklist rtl8xxxu" > $(BLCONF)
 	depmod -a $(KVER)
 	
 install_fw:
-	@mkdir -pv $(FWDIR)
-	@cp -v firmware/* $(FWDIR)
+	@install -Dvm 644 -t $(FWDIR) firmware/*
 
 uninstall:
 	@rm -vf $(MODDIR)/rtl8xxxu_git.ko
