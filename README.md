@@ -1,6 +1,6 @@
 ### Linux Kernel Module "rtl8xxxu"
 
-Driver for Realtek RTL8XXXXU usb wifi chips which is backported from linux mainline
+Driver for Realtek RTL8XXXXU usb wifi chips, which is backported from linux mainline
 <details>
 <summary>Click here to display a list of supported chips</summary>
 <pre><code>
