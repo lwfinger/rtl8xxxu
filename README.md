@@ -20,7 +20,29 @@ RTL8723AU | RTL8723BU
 
    switch it to "Wifi Mode" first by using the "usb_modeswitch" or "eject" command
 
-2. Install gcc, make, linux-headers and other packages required to build this module
+2.  You will need to install "make", "gcc", "kernel headers", "kernel build essentials", and "git".
+	You can install them with the following command, on **Ubuntu**:
+```bash
+	sudo apt-get update
+	sudo apt-get install make gcc linux-headers-$(uname -r) build-essential git
+```
+	For **Fedora**: You can install them with the following command
+```bash
+	sudo dnf install kernel-headers kernel-devel
+	sudo dnf group install "C Development Tools and Libraries"
+```
+	For **openSUSE**: Install necessary headers with
+```bash
+	sudo zypper install make gcc kernel-devel kernel-default-devel git libopenssl-devel
+```
+	For **Arch**: After installing the necessary kernel headers and base-devel,
+```bash
+	git clone https://aur.archlinux.org/rtw88-dkms-git.git
+	cd rtw88-dkms-git
+	makepkg -sri
+```
+If any of the packages above are not found check if your distro installs them under different names.
+
 
 3. Build and install the module 
 
@@ -46,9 +68,7 @@ RTL8723AU | RTL8723BU
 
 ### Note
 
-Supported linux kernel version: 6.0.x ~ 6.3.x
-
-Tested on Debian 11.6 (kernel version: 6.1.0-0.deb11.6-amd64) and it works fine.
+Supported linux kernel version: 5.15.x ~ 6.5.x
 
 Thanks to all the maintainers of this kernel module!
 
