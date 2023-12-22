@@ -5007,6 +5007,7 @@ rtl8xxxu_bss_info_changed(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 			  struct ieee80211_bss_conf *bss_conf, u32 changed)
 #endif
 {
+	struct rtl8xxxu_vif *rtlvif = (struct rtl8xxxu_vif *)vif->drv_priv;
 	struct rtl8xxxu_priv *priv = hw->priv;
 	struct device *dev = &priv->udev->dev;
 	struct ieee80211_sta *sta;
@@ -5023,7 +5024,7 @@ rtl8xxxu_bss_info_changed(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 		dev_dbg(dev, "Changed ASSOC: %i!\n", vif->bss_conf.assoc);
 #endif
 
-		rtl8xxxu_set_linktype(priv, vif->type, 0);
+		rtl8xxxu_set_linktype(priv, vif->type, rtlvif->port_num);
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
 		if (vif->cfg.assoc) {
@@ -5091,7 +5092,8 @@ rtl8xxxu_bss_info_changed(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 
 			rtl8xxxu_write8(priv, REG_BCN_MAX_ERR, 0xff);
 
-			rtl8xxxu_stop_tx_beacon(priv);
+			if (rtlvif->port_num == 0)
+				rtl8xxxu_stop_tx_beacon(priv);
 
 			/* joinbss sequence */
 			rtl8xxxu_write16(priv, REG_BCN_PSR_RPT,
@@ -5137,7 +5139,7 @@ rtl8xxxu_bss_info_changed(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 
 	if (changed & BSS_CHANGED_BSSID) {
 		dev_dbg(dev, "Changed BSSID!\n");
-		rtl8xxxu_set_bssid(priv, bss_conf->bssid, 0);
+		rtl8xxxu_set_bssid(priv, bss_conf->bssid, rtlvif->port_num);
 	}
 
 	if (changed & BSS_CHANGED_BASIC_RATES) {
