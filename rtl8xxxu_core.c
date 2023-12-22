@@ -6123,22 +6123,20 @@ void rtl8723bu_update_bt_link_info(struct rtl8xxxu_priv *priv, u8 bt_info)
 		btcoex->bt_busy = false;
 }
 
+static inline bool rtl8xxxu_is_assoc(struct rtl8xxxu_priv *priv)
+{
+	return (priv->vifs[0] && priv->vifs[0]->cfg.assoc) ||
+	       (priv->vifs[1] && priv->vifs[1]->cfg.assoc);
+}
+
 static
 void rtl8723bu_handle_bt_inquiry(struct rtl8xxxu_priv *priv)
 {
-	struct ieee80211_vif *vif;
 	struct rtl8xxxu_btcoex *btcoex;
-	bool wifi_connected;
 
-	vif = priv->vif;
 	btcoex = &priv->bt_coex;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
-	wifi_connected = (vif && vif->cfg.assoc);
-#else
-	wifi_connected = (vif && vif->bss_conf.assoc);
-#endif
 
-	if (!wifi_connected) {
+	if (!rtl8xxxu_is_assoc(priv)) {
 		rtl8723bu_set_ps_tdma(priv, 0x8, 0x0, 0x0, 0x0, 0x0);
 		rtl8723bu_set_coex_with_type(priv, 0);
 	} else if (btcoex->has_sco || btcoex->has_hid || btcoex->has_a2dp) {
@@ -6156,19 +6154,11 @@ void rtl8723bu_handle_bt_inquiry(struct rtl8xxxu_priv *priv)
 static
 void rtl8723bu_handle_bt_info(struct rtl8xxxu_priv *priv)
 {
-	struct ieee80211_vif *vif;
 	struct rtl8xxxu_btcoex *btcoex;
-	bool wifi_connected;
 
-	vif = priv->vif;
 	btcoex = &priv->bt_coex;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
-	wifi_connected = (vif && vif->cfg.assoc);
-#else
-	wifi_connected = (vif && vif->bss_conf.assoc);
-#endif
 
-	if (wifi_connected) {
+	if (rtl8xxxu_is_assoc(priv)) {
 		u32 val32 = 0;
 		u32 high_prio_tx = 0, high_prio_rx = 0;
 
@@ -7207,7 +7197,7 @@ static void rtl8xxxu_track_cfo(struct rtl8xxxu_priv *priv)
 	int crystal_cap;
 
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
-	if (!priv->vif || !priv->vif->cfg.assoc) {
+	if (!rtl8xxxu_is_assoc(priv)) {
 #else
 	if (!priv->vif || !priv->vif->bss_conf.assoc) {
 #endif
