@@ -7,6 +7,7 @@
 
 #include <asm/byteorder.h>
 #include <linux/bitfield.h>
+#include <linux/average.h>
 
 #define RTL8XXXU_DEBUG_REG_WRITE	0x01
 #define RTL8XXXU_DEBUG_REG_READ		0x02
