@@ -68,7 +68,7 @@ If any of the packages above are not found check if your distro installs them un
 
 ### Note
 
-Supported linux kernel version: 5.15.x ~ 6.5.x
+Supported linux kernel version: 5.6.x ~ 6.8.x
 
 Thanks to all the maintainers of this kernel module!
 

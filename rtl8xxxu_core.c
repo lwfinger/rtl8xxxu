@@ -4981,7 +4981,7 @@ static void rtl8xxxu_set_aifs(struct rtl8xxxu_priv *priv, u8 slot_time)
 void rtl8xxxu_update_ra_report(struct rtl8xxxu_ra_report *rarpt,
 			       u8 rate, u8 sgi, u8 bw)
 {
-	u8 mcs, nss;
+	u8 mcs = 0, nss = 0;
 
 	rarpt->txrate.flags = 0;
 
@@ -5760,15 +5760,12 @@ error:
 	dev_kfree_skb(skb);
 }
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
 static void rtl8xxxu_send_beacon_frame(struct ieee80211_hw *hw,
 				       struct ieee80211_vif *vif)
 {
 	struct rtl8xxxu_priv *priv = hw->priv;
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
 	struct sk_buff *skb = ieee80211_beacon_get(hw, vif, 0);
-#else
-	struct sk_buff *skb = ieee80211_beacon_get(hw, vif);
-#endif
 	struct device *dev = &priv->udev->dev;
 	int retry;
 	u8 val8;
@@ -5820,6 +5817,7 @@ static void rtl8xxxu_update_beacon_work_callback(struct work_struct *work)
 	}
 	rtl8xxxu_send_beacon_frame(hw, vif);
 }
+#endif
 
 static inline bool rtl8xxxu_is_packet_match_bssid(struct rtl8xxxu_priv *priv,
 						  struct ieee80211_hdr *hdr,
@@ -5827,10 +5825,13 @@ static inline bool rtl8xxxu_is_packet_match_bssid(struct rtl8xxxu_priv *priv,
 {
 	return priv->vifs[port_num] &&
 	       priv->vifs[port_num]->type == NL80211_IFTYPE_STATION &&
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 	       priv->vifs[port_num]->cfg.assoc &&
+#endif
 	       ether_addr_equal(priv->vifs[port_num]->bss_conf.bssid, hdr->addr2);
 }
 
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 static inline bool rtl8xxxu_is_sta_sta(struct rtl8xxxu_priv *priv)
 {
 	return (priv->vifs[0] && priv->vifs[0]->cfg.assoc &&
@@ -5838,6 +5839,7 @@ static inline bool rtl8xxxu_is_sta_sta(struct rtl8xxxu_priv *priv)
 	       (priv->vifs[1] && priv->vifs[1]->cfg.assoc &&
 		priv->vifs[1]->type == NL80211_IFTYPE_STATION);
 }
+#endif
 
 void rtl8723au_rx_parse_phystats(struct rtl8xxxu_priv *priv,
 				 struct ieee80211_rx_status *rx_status,
@@ -5857,7 +5859,9 @@ void rtl8723au_rx_parse_phystats(struct rtl8xxxu_priv *priv,
 		bool parse_cfo = priv->fops->set_crystal_cap &&
 				 !crc_icv_err &&
 				 !ieee80211_is_ctl(hdr->frame_control) &&
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 				 !rtl8xxxu_is_sta_sta(priv) &&
+#endif
 				 (rtl8xxxu_is_packet_match_bssid(priv, hdr, 0) ||
 				  rtl8xxxu_is_packet_match_bssid(priv, hdr, 1));
 
@@ -5896,7 +5900,9 @@ static void jaguar2_rx_parse_phystats_type1(struct rtl8xxxu_priv *priv,
 	bool parse_cfo = priv->fops->set_crystal_cap &&
 			 !crc_icv_err &&
 			 !ieee80211_is_ctl(hdr->frame_control) &&
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 			 !rtl8xxxu_is_sta_sta(priv) &&
+#endif
 			 (rtl8xxxu_is_packet_match_bssid(priv, hdr, 0) ||
 			  rtl8xxxu_is_packet_match_bssid(priv, hdr, 1));
 	u8 pwdb_max = 0;
@@ -6174,17 +6180,20 @@ void rtl8723bu_update_bt_link_info(struct rtl8xxxu_priv *priv, u8 bt_info)
 		btcoex->bt_busy = false;
 }
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
 static inline bool rtl8xxxu_is_assoc(struct rtl8xxxu_priv *priv)
 {
 	return (priv->vifs[0] && priv->vifs[0]->cfg.assoc) ||
 	       (priv->vifs[1] && priv->vifs[1]->cfg.assoc);
 }
+#endif
 
 static
 void rtl8723bu_handle_bt_inquiry(struct rtl8xxxu_priv *priv)
 {
 	struct rtl8xxxu_btcoex *btcoex;
 
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
 	btcoex = &priv->bt_coex;
 
 	if (!rtl8xxxu_is_assoc(priv)) {
@@ -6200,11 +6209,35 @@ void rtl8723bu_handle_bt_inquiry(struct rtl8xxxu_priv *priv)
 		rtl8723bu_set_ps_tdma(priv, 0x8, 0x0, 0x0, 0x0, 0x0);
 		rtl8723bu_set_coex_with_type(priv, 7);
 	}
+#else
+	struct ieee80211_vif *vif;
+	bool wifi_connected;
+
+	vif = priv->vifs[0];
+	btcoex = &priv->bt_coex;
+	wifi_connected = (vif && vif->bss_conf.assoc);
+
+	if (!wifi_connected) {
+		rtl8723bu_set_ps_tdma(priv, 0x8, 0x0, 0x0, 0x0, 0x0);
+		rtl8723bu_set_coex_with_type(priv, 0);
+	} else if (btcoex->has_sco || btcoex->has_hid || btcoex->has_a2dp) {
+		rtl8723bu_set_ps_tdma(priv, 0x61, 0x35, 0x3, 0x11, 0x11);
+		rtl8723bu_set_coex_with_type(priv, 4);
+	} else if (btcoex->has_pan) {
+		rtl8723bu_set_ps_tdma(priv, 0x61, 0x3f, 0x3, 0x11, 0x11);
+		rtl8723bu_set_coex_with_type(priv, 4);
+	} else {
+		rtl8723bu_set_ps_tdma(priv, 0x8, 0x0, 0x0, 0x0, 0x0);
+		rtl8723bu_set_coex_with_type(priv, 7);
+	}
+#endif
+
 }
 
 static
 void rtl8723bu_handle_bt_info(struct rtl8xxxu_priv *priv)
 {
+#if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
 	struct rtl8xxxu_btcoex *btcoex;
 
 	btcoex = &priv->bt_coex;
@@ -6252,6 +6285,59 @@ void rtl8723bu_handle_bt_info(struct rtl8xxxu_priv *priv)
 		rtl8723bu_set_ps_tdma(priv, 0x8, 0x0, 0x0, 0x0, 0x0);
 		rtl8723bu_set_coex_with_type(priv, 0);
 	}
+#else
+	struct ieee80211_vif *vif;
+	struct rtl8xxxu_btcoex *btcoex;
+	bool wifi_connected;
+
+	vif = priv->vifs[0];
+	btcoex = &priv->bt_coex;
+	wifi_connected = (vif && vif->bss_conf.assoc);
+
+	if (wifi_connected) {
+		u32 val32 = 0;
+		u32 high_prio_tx = 0, high_prio_rx = 0;
+
+		val32 = rtl8xxxu_read32(priv, 0x770);
+		high_prio_tx = val32 & 0x0000ffff;
+		high_prio_rx = (val32  & 0xffff0000) >> 16;
+
+		if (btcoex->bt_busy) {
+			if (btcoex->hid_only) {
+				rtl8723bu_set_ps_tdma(priv, 0x61, 0x20,
+						      0x3, 0x11, 0x11);
+				rtl8723bu_set_coex_with_type(priv, 5);
+			} else if (btcoex->a2dp_only) {
+				rtl8723bu_set_ps_tdma(priv, 0x61, 0x35,
+						      0x3, 0x11, 0x11);
+				rtl8723bu_set_coex_with_type(priv, 4);
+			} else if ((btcoex->has_a2dp && btcoex->has_pan) ||
+				   (btcoex->has_hid && btcoex->has_a2dp &&
+				    btcoex->has_pan)) {
+				rtl8723bu_set_ps_tdma(priv, 0x51, 0x21,
+						      0x3, 0x10, 0x10);
+				rtl8723bu_set_coex_with_type(priv, 4);
+			} else if (btcoex->has_hid && btcoex->has_a2dp) {
+				rtl8723bu_set_ps_tdma(priv, 0x51, 0x21,
+						      0x3, 0x10, 0x10);
+				rtl8723bu_set_coex_with_type(priv, 3);
+			} else {
+				rtl8723bu_set_ps_tdma(priv, 0x61, 0x35,
+						      0x3, 0x11, 0x11);
+				rtl8723bu_set_coex_with_type(priv, 4);
+			}
+		} else {
+			rtl8723bu_set_ps_tdma(priv, 0x8, 0x0, 0x0, 0x0, 0x0);
+			if (high_prio_tx + high_prio_rx <= 60)
+				rtl8723bu_set_coex_with_type(priv, 2);
+			else
+				rtl8723bu_set_coex_with_type(priv, 7);
+		}
+	} else {
+		rtl8723bu_set_ps_tdma(priv, 0x8, 0x0, 0x0, 0x0, 0x0);
+		rtl8723bu_set_coex_with_type(priv, 0);
+	}
+#endif
 }
 
 static void rtl8xxxu_c2hcmd_callback(struct work_struct *work)
@@ -7441,7 +7527,7 @@ static void rtl8xxxu_track_cfo(struct rtl8xxxu_priv *priv)
 #if (LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0))
 	if (!rtl8xxxu_is_assoc(priv)) {
 #else
-	if (!priv->vif || !priv->vif->bss_conf.assoc) {
+	if (!priv->vifs[0] || !priv->vifs[0]->bss_conf.assoc) {
 #endif
 		/* Reset */
 		cfo->adjust = true;
@@ -7982,7 +8068,9 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
 	spin_lock_init(&priv->rx_urb_lock);
 	INIT_WORK(&priv->rx_urb_wq, rtl8xxxu_rx_urb_work);
 	INIT_DELAYED_WORK(&priv->ra_watchdog, rtl8xxxu_watchdog_callback);
+#if LINUX_VERSION_CODE >= KERNEL_VERSION(6, 0, 0)
 	INIT_DELAYED_WORK(&priv->update_beacon_work, rtl8xxxu_update_beacon_work_callback);
+#endif
 	skb_queue_head_init(&priv->c2hcmd_queue);
 
 	usb_set_intfdata(interface, hw);

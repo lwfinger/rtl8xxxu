@@ -8,6 +8,10 @@
 #include <asm/byteorder.h>
 #include <linux/bitfield.h>
 #include <linux/average.h>
+#include <linux/version.h>
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5, 14, 0)
+#include <linux/leds.h>
+#endif
 
 #define RTL8XXXU_DEBUG_REG_WRITE	0x01
 #define RTL8XXXU_DEBUG_REG_READ		0x02
